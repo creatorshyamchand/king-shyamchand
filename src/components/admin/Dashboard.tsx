@@ -29,13 +29,24 @@ type Payment = {
   created_at: string;
 };
 
+type Submission = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+  created_at: string;
+};
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("overview");
   const [students, setStudents] = useState<Student[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadingSubmissions, setLoadingSubmissions] = useState(false);
 
   useEffect(() => {
     // Check if admin is authenticated
@@ -86,6 +97,30 @@ const Dashboard = () => {
     })();
   }, [toast]);
 
+  // Fetch contact submissions for the Submissions tab
+  useEffect(() => {
+    if (activeTab === "submissions") {
+      setLoadingSubmissions(true);
+      supabase
+        .from("contact_submissions")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .then(({ data, error }) => {
+          if (error) {
+            toast({
+              title: "Failed to load submissions",
+              description: error.message,
+              variant: "destructive",
+            });
+            setSubmissions([]);
+          } else {
+            setSubmissions(data || []);
+          }
+          setLoadingSubmissions(false);
+        });
+    }
+  }, [activeTab, toast]);
+
   const handleLogout = () => {
     localStorage.removeItem("admin_authenticated");
     toast({
@@ -112,10 +147,11 @@ const Dashboard = () => {
       </div>
 
       <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="mb-8">
+        <TabsList className="mb-8 flex flex-wrap">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="students">Students</TabsTrigger>
           <TabsTrigger value="payments">Payments</TabsTrigger>
+          <TabsTrigger value="submissions">Submissions</TabsTrigger>
         </TabsList>
         
         {/* Overview Tab */}
@@ -250,6 +286,49 @@ const Dashboard = () => {
                   </tbody>
                 </table>
                 )}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Submissions Tab */}
+        <TabsContent value="submissions">
+          <Card>
+            <CardHeader>
+              <CardTitle>Contact Submissions</CardTitle>
+              <CardDescription>See all messages submitted via the contact form</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                {loadingSubmissions ? (
+                  <div className="p-8 text-center">Loading submissions...</div>
+                ) : (
+                  submissions.length === 0 ? (
+                    <div className="p-8 text-center text-muted-foreground">No submissions found.</div>
+                  ) : (
+                  <table className="w-full">
+                    <thead className="bg-muted">
+                      <tr>
+                        <th className="py-3 px-4 text-left">Name</th>
+                        <th className="py-3 px-4 text-left">Email</th>
+                        <th className="py-3 px-4 text-left">Phone</th>
+                        <th className="py-3 px-4 text-left">Message</th>
+                        <th className="py-3 px-4 text-left">Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {submissions.map((sub) => (
+                        <tr key={sub.id} className="border-b border-muted">
+                          <td className="py-3 px-4">{sub.name}</td>
+                          <td className="py-3 px-4">{sub.email}</td>
+                          <td className="py-3 px-4">{sub.phone}</td>
+                          <td className="py-3 px-4 max-w-xs break-words">{sub.message}</td>
+                          <td className="py-3 px-4">{new Date(sub.created_at).toLocaleDateString()}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                ))}
               </div>
             </CardContent>
           </Card>
