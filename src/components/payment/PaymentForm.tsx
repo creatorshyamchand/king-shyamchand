@@ -6,12 +6,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { Phone } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PaymentFormProps {
   courseName: string;
   coursePrice: number;
   onPaymentComplete?: () => void;
 }
+
+const UPI_ID = "8016827315@ybl"; // Replace with your UPI ID
 
 const PaymentForm = ({ courseName, coursePrice, onPaymentComplete }: PaymentFormProps) => {
   const { toast } = useToast();
@@ -28,26 +31,48 @@ const PaymentForm = ({ courseName, coursePrice, onPaymentComplete }: PaymentForm
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Utility for opening UPI payment intent (Android)
+  const openUPIPayment = () => {
+    const amount = coursePrice.toFixed(2);
+    const upiUrl = `upi://pay?pa=${encodeURIComponent(UPI_ID)}&pn=${encodeURIComponent(formData.fullName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(courseName)}`;
+    window.location.href = upiUrl;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsProcessing(true);
-    
-    // Simulating payment processing with PhonePe
-    setTimeout(() => {
-      // This would be replaced with actual PhonePe integration
+
+    // Store payment record before redirecting to payment app
+    const { error } = await supabase.from("payments").insert([{
+      full_name: formData.fullName,
+      email: formData.email,
+      phone: formData.phone,
+      guardian_name: formData.guardianName,
+      course: courseName,
+      amount: coursePrice,
+      upi_id: UPI_ID,
+      status: "pending",
+    }]);
+    setIsProcessing(false);
+
+    if (error) {
       toast({
-        title: "Payment initiated!",
-        description: "You will be redirected to PhonePe for payment completion.",
+        title: "Error saving payment",
+        description: error.message,
+        variant: "destructive"
       });
-      
-      // Simulate PhonePe redirect
-      setTimeout(() => {
-        setIsProcessing(false);
-        if (onPaymentComplete) {
-          onPaymentComplete();
-        }
-      }, 1500);
-    }, 1000);
+      return;
+    }
+
+    toast({
+      title: "Proceed to Pay",
+      description: "You will be redirected to a payment app to complete your payment.",
+    });
+
+    setTimeout(() => {
+      openUPIPayment();
+      if (onPaymentComplete) onPaymentComplete();
+    }, 900);
   };
 
   return (
@@ -55,7 +80,7 @@ const PaymentForm = ({ courseName, coursePrice, onPaymentComplete }: PaymentForm
       <CardHeader>
         <CardTitle>Enroll in {courseName}</CardTitle>
         <CardDescription>
-          Complete the form below and proceed to payment with PhonePe
+          Complete the form below and proceed to payment with your preferred payment app.
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
@@ -108,6 +133,9 @@ const PaymentForm = ({ courseName, coursePrice, onPaymentComplete }: PaymentForm
           <div className="pt-2">
             <p className="font-medium">Amount to pay: <span className="text-lg font-bold">₹{coursePrice}</span></p>
           </div>
+          <div className="text-academy-primary text-sm">
+            UPI ID: <b>{UPI_ID}</b>
+          </div>
         </CardContent>
         <CardFooter>
           <Button 
@@ -117,7 +145,7 @@ const PaymentForm = ({ courseName, coursePrice, onPaymentComplete }: PaymentForm
           >
             {isProcessing ? "Processing..." : (
               <>
-                <Phone size={18} /> Pay with PhonePe
+                <Phone size={18} /> Pay via Payment App
               </>
             )}
           </Button>

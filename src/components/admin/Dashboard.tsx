@@ -5,28 +5,37 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
-// Mock data for students and enrollments
-const MOCK_STUDENTS = [
-  { id: 1, name: "Rahul Sharma", email: "rahul@example.com", course: "English (Class 5-8)", joinedOn: "2023-04-15", paymentStatus: "Paid" },
-  { id: 2, name: "Priya Patel", email: "priya@example.com", course: "English (Class 9-12)", joinedOn: "2023-04-10", paymentStatus: "Pending" },
-  { id: 3, name: "Amit Kumar", email: "amit@example.com", course: "English (Class 5-8)", joinedOn: "2023-04-05", paymentStatus: "Paid" },
-  { id: 4, name: "Sneha Roy", email: "sneha@example.com", course: "English (Class 9-12)", joinedOn: "2023-04-02", paymentStatus: "Paid" },
-  { id: 5, name: "Vikram Singh", email: "vikram@example.com", course: "English (Class 5-8)", joinedOn: "2023-03-25", paymentStatus: "Pending" },
-];
+type Student = {
+  id: string;
+  name: string;
+  email: string;
+  course: string;
+  joinedOn: string;
+  paymentStatus: string;
+};
 
-const MOCK_PAYMENTS = [
-  { id: "PAY001", studentName: "Rahul Sharma", course: "English (Class 5-8)", amount: 2500, date: "2023-04-15", method: "PhonePe" },
-  { id: "PAY002", studentName: "Sneha Roy", course: "English (Class 9-12)", amount: 3500, date: "2023-04-02", method: "PhonePe" },
-  { id: "PAY003", studentName: "Amit Kumar", course: "English (Class 5-8)", amount: 2500, date: "2023-04-05", method: "PhonePe" },
-];
+type Payment = {
+  id: string;
+  full_name: string;
+  email: string;
+  phone: string;
+  guardian_name: string | null;
+  course: string;
+  amount: number;
+  upi_id: string;
+  status: string;
+  created_at: string;
+};
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("overview");
-  const [students, setStudents] = useState(MOCK_STUDENTS);
-  const [payments, setPayments] = useState(MOCK_PAYMENTS);
+  const [students, setStudents] = useState<Student[]>([]);
+  const [payments, setPayments] = useState<Payment[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Check if admin is authenticated
@@ -41,6 +50,42 @@ const Dashboard = () => {
     }
   }, [navigate, toast]);
 
+  useEffect(() => {
+    // Fetch payments from Supabase
+    (async () => {
+      setIsLoading(true);
+      const { data: paymentRows, error } = await supabase
+        .from("payments")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) {
+        toast({
+          title: "Failed to load payments",
+          description: error.message,
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+      setPayments(paymentRows || []);
+
+      // For student tab: Simplified by grouping by unique student (email) and check payment status
+      const studentMap: Record<string, Student> = {};
+      (paymentRows || []).forEach((pay) => {
+        studentMap[pay.email] = {
+          id: pay.id,
+          name: pay.full_name,
+          email: pay.email,
+          course: pay.course,
+          joinedOn: new Date(pay.created_at).toLocaleDateString(),
+          paymentStatus: pay.status === "paid" ? "Paid" : "Pending",
+        };
+      });
+      setStudents(Object.values(studentMap));
+      setIsLoading(false);
+    })();
+  }, [toast]);
+
   const handleLogout = () => {
     localStorage.removeItem("admin_authenticated");
     toast({
@@ -49,6 +94,9 @@ const Dashboard = () => {
     });
     navigate("/admin");
   };
+
+  // Calculate revenue and totals
+  const totalRevenue = payments.filter((p) => p.status === "paid").reduce((total, p) => total + p.amount, 0);
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -86,11 +134,11 @@ const Dashboard = () => {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-xl">Total Revenue</CardTitle>
-                <CardDescription>From all courses</CardDescription>
+                <CardDescription>From all courses (paid only)</CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-4xl font-bold text-academy-primary">
-                  ₹{payments.reduce((total, payment) => total + payment.amount, 0)}
+                  ₹{totalRevenue}
                 </p>
               </CardContent>
             </Card>
@@ -118,6 +166,9 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
+                {isLoading ? (
+                  <div className="p-8 text-center">Loading students...</div>
+                ) : (
                 <table className="w-full">
                   <thead className="bg-muted">
                     <tr>
@@ -146,6 +197,7 @@ const Dashboard = () => {
                     ))}
                   </tbody>
                 </table>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -160,6 +212,9 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
+                {isLoading ? (
+                  <div className="p-8 text-center">Loading payments...</div>
+                ) : (
                 <table className="w-full">
                   <thead className="bg-muted">
                     <tr>
@@ -169,21 +224,32 @@ const Dashboard = () => {
                       <th className="py-3 px-4 text-left">Amount</th>
                       <th className="py-3 px-4 text-left">Date</th>
                       <th className="py-3 px-4 text-left">Method</th>
+                      <th className="py-3 px-4 text-left">Status</th>
                     </tr>
                   </thead>
                   <tbody>
                     {payments.map(payment => (
                       <tr key={payment.id} className="border-b border-muted">
                         <td className="py-3 px-4">{payment.id}</td>
-                        <td className="py-3 px-4">{payment.studentName}</td>
+                        <td className="py-3 px-4">{payment.full_name}</td>
                         <td className="py-3 px-4">{payment.course}</td>
                         <td className="py-3 px-4">₹{payment.amount}</td>
-                        <td className="py-3 px-4">{payment.date}</td>
-                        <td className="py-3 px-4">{payment.method}</td>
+                        <td className="py-3 px-4">{new Date(payment.created_at).toLocaleDateString()}</td>
+                        <td className="py-3 px-4">UPI</td>
+                        <td className="py-3 px-4">
+                          <span className={`px-2 py-1 rounded-full text-xs ${
+                            payment.status === "paid"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-yellow-100 text-yellow-800"
+                          }`}>
+                            {payment.status.charAt(0).toUpperCase() + payment.status.slice(1)}
+                          </span>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
+                )}
               </div>
             </CardContent>
           </Card>
