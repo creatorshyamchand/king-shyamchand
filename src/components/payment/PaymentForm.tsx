@@ -14,7 +14,7 @@ interface PaymentFormProps {
   onPaymentComplete?: () => void;
 }
 
-const UPI_ID = "8016827315@ybl"; // Replace with your UPI ID
+const UPI_ID = "8016827315@ybl"; 
 
 const PaymentForm = ({ courseName, coursePrice, onPaymentComplete }: PaymentFormProps) => {
   const { toast } = useToast();
