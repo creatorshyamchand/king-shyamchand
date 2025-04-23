@@ -61,6 +61,13 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				academy: {
+					primary: '#9b87f5',
+					secondary: '#7E69AB',
+					accent: '#D6BCFA',
+					dark: '#1A1F2C',
+					light: '#F1F0FB' 
 				}
 			},
 			borderRadius: {
