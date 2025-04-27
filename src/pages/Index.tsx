@@ -6,23 +6,24 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import CourseCard from "@/components/courses/CourseCard";
 import { courses } from "@/data/courses";
+import { Book, Mail, Phone } from "lucide-react";
 
 const Index = () => {
   const [testimonials] = useState([
     {
-      name: "Riya Sharma",
-      class: "Class 10",
-      content: "Mythun Academy's English course helped me improve my writing skills significantly. I scored an A+ in my board exam!",
+      name: "Arpita Roy",
+      class: "Advanced English",
+      content: "Professor Das's teaching method helped me gain confidence in public speaking and writing.",
     },
     {
-      name: "Arjun Patel",
-      class: "Class 7",
-      content: "The interactive teaching style makes learning English fun. I used to dislike grammar, but now I enjoy it!",
+      name: "Rahul Kumar",
+      class: "Foundation Course",
+      content: "The foundation course was exactly what I needed to improve my basic English skills.",
     },
     {
-      name: "Neha Gupta",
-      class: "Class 12",
-      content: "The focused preparation for board exams was exactly what I needed. The practice materials were very helpful.",
+      name: "Priya Sharma",
+      class: "Advanced English",
+      content: "The literature analysis techniques I learned have been invaluable in my academic journey.",
     },
   ]);
 
@@ -34,28 +35,28 @@ const Index = () => {
       <section className="bg-gradient-to-r from-academy-primary to-academy-secondary text-white py-16">
         <div className="container mx-auto px-4 flex flex-col md:flex-row items-center">
           <div className="md:w-1/2 mb-8 md:mb-0">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">Welcome to Mythun Academy</h1>
-            <p className="text-xl mb-6">Excellence in English Education</p>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">Welcome to English Academy</h1>
+            <p className="text-xl mb-6">Learn English with Prof. Shyamchand Das</p>
             <p className="mb-8">
-              Transform your English skills with our specialized courses taught by expert instructor Mr. Mithun Das.
-              Comprehensive programs for students from Class 5 to 12.
+              Transform your English proficiency through personalized instruction and proven teaching methods.
+              Join our comprehensive English courses designed for all skill levels.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link to="/courses">
                 <Button className="bg-white text-academy-primary hover:bg-academy-light">
-                  Explore Courses
+                  View Courses
                 </Button>
               </Link>
               <Link to="/contact">
                 <Button variant="outline" className="border-white text-white hover:bg-white hover:text-academy-primary">
-                  Contact Us
+                  Get in Touch
                 </Button>
               </Link>
             </div>
           </div>
           <div className="md:w-1/2">
             <img 
-              src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&h=600" 
+              src="https://images.unsplash.com/photo-1606761568499-6d2451b23c66?auto=format&fit=crop&w=800&h=600" 
               alt="English Education" 
               className="rounded-lg shadow-xl"
             />
@@ -69,32 +70,42 @@ const Index = () => {
           <div className="flex flex-col md:flex-row gap-10 items-center">
             <div className="md:w-1/3 mb-8 md:mb-0">
               <img 
-                src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=600&h=800" 
-                alt="Mythun Academy" 
+                src="https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=600&h=800" 
+                alt="Prof. Shyamchand Das" 
                 className="rounded-lg shadow-lg"
               />
             </div>
             <div className="md:w-2/3">
-              <h2 className="text-3xl font-bold mb-6 text-academy-dark">About Mythun Academy</h2>
+              <h2 className="text-3xl font-bold mb-6 text-academy-dark">About Prof. Shyamchand Das</h2>
               <p className="mb-4 text-gray-700">
-                Mythun Academy was founded with a mission to provide quality English education to students across all grade levels. 
-                We are located in Aurangabad, Suti 2, Murshidabad, West Bengal, India.
+                With over 12 years of experience in English education, Prof. Shyamchand Das has helped countless students 
+                achieve their language learning goals through personalized instruction and innovative teaching methods.
               </p>
               <p className="mb-6 text-gray-700">
-                Our approach combines traditional teaching methods with modern techniques, ensuring that students not only excel in their examinations but also develop a genuine appreciation for the English language.
+                Based in West Bengal, India, he specializes in making English learning accessible and enjoyable 
+                for students of all levels, from beginners to advanced learners.
               </p>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="bg-white p-4 rounded-lg shadow text-center">
-                  <h3 className="font-bold text-academy-primary text-xl">Experienced</h3>
-                  <p className="text-gray-600">Led by expert teacher Mr. Mithun Das</p>
+                  <div className="flex justify-center mb-2">
+                    <Book className="text-academy-primary" size={24} />
+                  </div>
+                  <h3 className="font-bold text-academy-primary text-xl">Expert Teacher</h3>
+                  <p className="text-gray-600">12+ years experience</p>
                 </div>
                 <div className="bg-white p-4 rounded-lg shadow text-center">
-                  <h3 className="font-bold text-academy-primary text-xl">Comprehensive</h3>
-                  <p className="text-gray-600">Complete curriculum coverage for all levels</p>
+                  <div className="flex justify-center mb-2">
+                    <Mail className="text-academy-primary" size={24} />
+                  </div>
+                  <h3 className="font-bold text-academy-primary text-xl">Personalized</h3>
+                  <p className="text-gray-600">Individual attention</p>
                 </div>
                 <div className="bg-white p-4 rounded-lg shadow text-center">
-                  <h3 className="font-bold text-academy-primary text-xl">Result-Oriented</h3>
-                  <p className="text-gray-600">Proven track record of student success</p>
+                  <div className="flex justify-center mb-2">
+                    <Phone className="text-academy-primary" size={24} />
+                  </div>
+                  <h3 className="font-bold text-academy-primary text-xl">Always Available</h3>
+                  <p className="text-gray-600">Dedicated support</p>
                 </div>
               </div>
             </div>
@@ -106,8 +117,8 @@ const Index = () => {
       <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-2">Our English Courses</h2>
-            <p className="text-gray-600">Specialized programs tailored to different age groups</p>
+            <h2 className="text-3xl font-bold mb-2">Featured Courses</h2>
+            <p className="text-gray-600">Comprehensive English programs for all levels</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {courses.map((course) => (
@@ -149,9 +160,9 @@ const Index = () => {
       {/* Call to Action */}
       <section className="bg-academy-primary text-white py-12">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4">Ready to Transform Your English Skills?</h2>
+          <h2 className="text-3xl font-bold mb-4">Ready to Master English?</h2>
           <p className="mb-8 max-w-2xl mx-auto">
-            Join Mythun Academy today and embark on a journey toward English language mastery.
+            Join Prof. Shyamchand Das's English Academy and embark on your journey to English proficiency.
           </p>
           <Link to="/courses">
             <Button className="bg-white text-academy-primary hover:bg-academy-light px-8 py-2">
