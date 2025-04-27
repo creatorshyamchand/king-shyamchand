@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -6,7 +5,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import CourseCard from "@/components/courses/CourseCard";
 import { courses } from "@/data/courses";
-import { Book, Mail, Phone } from "lucide-react";
+import { Book, Mail, Phone, Award, Code } from "lucide-react";
 
 const Index = () => {
   const [testimonials] = useState([
@@ -27,6 +26,21 @@ const Index = () => {
     },
   ]);
 
+  const [certificates] = useState([
+    {
+      title: "Advanced Web Development",
+      issuer: "International Web Technologies Institute",
+      year: 2020,
+      icon: <Code className="text-academy-primary" size={24} />
+    },
+    {
+      title: "Full Stack JavaScript Certification",
+      issuer: "Global Programming Academy",
+      year: 2019,
+      icon: <Award className="text-academy-primary" size={24} />
+    }
+  ]);
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -35,11 +49,14 @@ const Index = () => {
       <section className="bg-gradient-to-r from-academy-primary to-academy-secondary text-white py-16">
         <div className="container mx-auto px-4 flex flex-col md:flex-row items-center">
           <div className="md:w-1/2 mb-8 md:mb-0">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">Welcome to English Academy</h1>
-            <p className="text-xl mb-6">Learn English with Prof. Shyamchand Das</p>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">Professional Web Developer & Educator</h1>
+            <p className="text-xl mb-6">Bridging Technology and Learning</p>
             <p className="mb-8">
-              Transform your English proficiency through personalized instruction and proven teaching methods.
-              Join our comprehensive English courses designed for all skill levels.
+              With over a decade of experience in web development and education, 
+              I specialize in creating innovative digital solutions and empowering 
+              individuals through comprehensive technology training. My approach 
+              combines cutting-edge programming skills with effective teaching methodologies, 
+              helping students and clients transform their digital aspirations into reality.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link to="/courses">
@@ -49,7 +66,7 @@ const Index = () => {
               </Link>
               <Link to="/contact">
                 <Button variant="outline" className="border-white text-white hover:bg-white hover:text-academy-primary">
-                  Get in Touch
+                  Contact Me
                 </Button>
               </Link>
             </div>
@@ -57,9 +74,31 @@ const Index = () => {
           <div className="md:w-1/2">
             <img 
               src="https://images.unsplash.com/photo-1606761568499-6d2451b23c66?auto=format&fit=crop&w=800&h=600" 
-              alt="English Education" 
+              alt="Professional Web Developer" 
               className="rounded-lg shadow-xl"
             />
+          </div>
+        </div>
+      </section>
+
+      {/* Certificates Section */}
+      <section className="py-16 bg-academy-light">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-2">Professional Certifications</h2>
+            <p className="text-gray-600">Validated Expertise in Web Development</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {certificates.map((cert, index) => (
+              <div key={index} className="bg-white p-6 rounded-lg shadow-lg flex items-center gap-6">
+                <div className="flex-shrink-0">{cert.icon}</div>
+                <div>
+                  <h3 className="text-xl font-bold text-academy-primary mb-2">{cert.title}</h3>
+                  <p className="text-gray-600">{cert.issuer}</p>
+                  <p className="text-sm text-gray-500">Awarded in {cert.year}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
