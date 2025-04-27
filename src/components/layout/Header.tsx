@@ -1,6 +1,7 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, Book } from "lucide-react";
+import { Menu, X, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const Header = () => {
@@ -10,8 +11,8 @@ const Header = () => {
     <header className="bg-academy-primary shadow-md sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <Link to="/" className="flex items-center gap-2">
-          <Book className="text-white" size={24} />
-          <span className="font-bold text-xl md:text-2xl text-white">Prof. Das Academy</span>
+          <Crown className="text-white" size={28} />
+          <span className="font-bold text-xl md:text-2xl text-white">King Shyam Academy</span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -30,7 +31,7 @@ const Header = () => {
           </Link>
           <Link to="/admin">
             <Button className="bg-white text-academy-primary hover:bg-academy-light">
-              Admin Login
+              Client Portal
             </Button>
           </Link>
         </nav>
